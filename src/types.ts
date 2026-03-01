@@ -18,7 +18,10 @@ export interface Cartridge {
 }
 
 export interface AppState {
+  version: number
   currentCartridge: Cartridge | null
   history: Cartridge[]
   notificationEnabled: boolean
 }
+
+export const CURRENT_SCHEMA_VERSION = 2

@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import type { AppState, Cartridge } from '../types'
-import { loadState, saveState } from '../lib/storage'
+import { loadState, saveState, importState } from '../lib/storage'
 
 function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2)
@@ -74,10 +74,33 @@ export function useAppState() {
     })
   }, [])
 
+  const deleteHistory = useCallback((id: string) => {
+    setState(prev => {
+      const next: AppState = {
+        ...prev,
+        history: prev.history.filter(c => c.id !== id),
+      }
+      saveState(next)
+      return next
+    })
+  }, [])
+
+  const importData = useCallback((json: string) => {
+    try {
+      const newState = importState(json)
+      setState(newState)
+      return true
+    } catch {
+      return false
+    }
+  }, [])
+
   return {
     state,
     startNewCartridge,
     adjustRemainingDoses,
     changeDailyDoses,
+    deleteHistory,
+    importData,
   }
 }

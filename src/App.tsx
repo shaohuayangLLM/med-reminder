@@ -6,9 +6,10 @@ import { requestNotificationPermission, sendNotification } from './lib/notificat
 import { StatusDisplay } from './components/StatusDisplay'
 import { ActionButtons } from './components/ActionButtons'
 import { History } from './components/History'
+import { DataManager } from './components/DataManager'
 
 function App() {
-  const { state, startNewCartridge, adjustRemainingDoses, changeDailyDoses } = useAppState()
+  const { state, startNewCartridge, adjustRemainingDoses, changeDailyDoses, deleteHistory, importData } = useAppState()
   const today = new Date().toISOString().split('T')[0]
 
   const status = state.currentCartridge
@@ -68,7 +69,8 @@ function App() {
             onAdjustRemaining={adjustRemainingDoses}
             onChangeDailyDoses={changeDailyDoses}
           />
-          <History history={state.history} />
+          <History history={state.history} onDelete={deleteHistory} />
+          <DataManager onImport={importData} />
         </div>
       </div>
     </div>
