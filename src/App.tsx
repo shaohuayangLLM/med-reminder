@@ -1,6 +1,8 @@
+import { useEffect } from 'react'
 import { useAppState } from './hooks/useAppState'
 import { calculateDoseStatus } from './lib/dose-calculator'
 import { getAlertLevel, AlertLevel } from './lib/alert-level'
+import { requestNotificationPermission, sendNotification } from './lib/notification'
 import { StatusDisplay } from './components/StatusDisplay'
 import { ActionButtons } from './components/ActionButtons'
 import { History } from './components/History'
@@ -16,6 +18,14 @@ function App() {
   const alertLevel = status
     ? getAlertLevel(status.remainingDoses, status.currentDailyDoses)
     : null
+
+  useEffect(() => {
+    if (alertLevel && alertLevel !== AlertLevel.None) {
+      requestNotificationPermission().then(granted => {
+        if (granted) sendNotification(alertLevel)
+      })
+    }
+  }, [alertLevel])
 
   return (
     <div className="min-h-screen bg-slate-50 flex justify-center">
