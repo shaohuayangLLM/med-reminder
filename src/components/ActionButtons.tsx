@@ -1,12 +1,16 @@
 import { useState } from 'react'
 import { Modal } from './Modal'
 
+function todayStr(): string {
+  return new Date().toISOString().split('T')[0]
+}
+
 interface ActionButtonsProps {
   hasCartridge: boolean
   currentDailyDoses: number
   onNewCartridge: (totalDoses: number, dailyDoses: number) => void
   onAdjustRemaining: (remaining: number) => void
-  onChangeDailyDoses: (dailyDoses: number) => void
+  onChangeDailyDoses: (dailyDoses: number, effectiveDate?: string) => void
 }
 
 export function ActionButtons({
@@ -21,6 +25,7 @@ export function ActionButtons({
   const [dailyInput, setDailyInput] = useState('3')
   const [remainingInput, setRemainingInput] = useState('')
   const [newDailyInput, setNewDailyInput] = useState('')
+  const [effectiveDateInput, setEffectiveDateInput] = useState('')
 
   const close = () => setModal(null)
 
@@ -43,7 +48,7 @@ export function ActionButtons({
               修正次数
             </button>
             <button
-              onClick={() => { setNewDailyInput(String(currentDailyDoses)); setModal('daily') }}
+              onClick={() => { setNewDailyInput(String(currentDailyDoses)); setEffectiveDateInput(todayStr()); setModal('daily') }}
               className="flex-1 h-[50px] rounded-[14px] bg-[#f6f6f6] text-black text-[15px] font-medium tracking-[-0.4px] active:scale-[0.97] active:bg-[#ebebeb] transition-all"
             >
               调整每日
@@ -85,11 +90,19 @@ export function ActionButtons({
 
       <Modal open={modal === 'daily'} onClose={close} title="调整每日次数">
         <div className="flex flex-col gap-4">
-          <p className="text-[13px] text-[rgba(60,60,67,0.6)] tracking-[-0.1px]">从今天起生效</p>
-          <input type="number" value={newDailyInput}
-            onChange={e => setNewDailyInput(e.target.value)}
-            className="w-full h-11 rounded-xl border border-[#e5e5ea] px-4 text-[17px] tracking-[-0.4px] outline-none focus:border-black transition-colors" />
-          <button onClick={() => { onChangeDailyDoses(Number(newDailyInput)); close() }}
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[13px] text-[rgba(60,60,67,0.6)] tracking-[-0.1px]">每日次数</span>
+            <input type="number" value={newDailyInput}
+              onChange={e => setNewDailyInput(e.target.value)}
+              className="w-full h-11 rounded-xl border border-[#e5e5ea] px-4 text-[17px] tracking-[-0.4px] outline-none focus:border-black transition-colors" />
+          </label>
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[13px] text-[rgba(60,60,67,0.6)] tracking-[-0.1px]">生效日期</span>
+            <input type="date" value={effectiveDateInput}
+              onChange={e => setEffectiveDateInput(e.target.value)}
+              className="w-full h-11 rounded-xl border border-[#e5e5ea] px-4 text-[17px] tracking-[-0.4px] outline-none focus:border-black transition-colors" />
+          </label>
+          <button onClick={() => { onChangeDailyDoses(Number(newDailyInput), effectiveDateInput); close() }}
             className="w-full h-[50px] rounded-[14px] bg-black text-white text-[17px] font-medium tracking-[-0.4px] active:scale-[0.97] transition-transform">
             确认
           </button>

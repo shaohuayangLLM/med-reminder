@@ -55,17 +55,17 @@ export function useAppState() {
     })
   }, [])
 
-  const changeDailyDoses = useCallback((dailyDoses: number) => {
+  const changeDailyDoses = useCallback((dailyDoses: number, effectiveDate?: string) => {
     setState(prev => {
       if (!prev.currentCartridge) return prev
-      const today = todayStr()
+      const date = effectiveDate || todayStr()
       const next: AppState = {
         ...prev,
         currentCartridge: {
           ...prev.currentCartridge,
           dosageChanges: [
             ...prev.currentCartridge.dosageChanges,
-            { date: today, dailyDoses },
+            { date, dailyDoses },
           ],
         },
       }
