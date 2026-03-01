@@ -13,11 +13,6 @@ function todayStr(): string {
 export function useAppState() {
   const [state, setState] = useState<AppState>(loadState)
 
-  const persist = useCallback((next: AppState) => {
-    setState(next)
-    saveState(next)
-  }, [])
-
   const startNewCartridge = useCallback((totalDoses: number, dailyDoses: number) => {
     const today = todayStr()
     const newCartridge: Cartridge = {
