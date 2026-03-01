@@ -6,41 +6,40 @@ interface RingProgressProps {
   alertLevel: AlertLevel
 }
 
-const COLORS = {
-  [AlertLevel.None]: 'stroke-emerald-500',
-  [AlertLevel.Warning]: 'stroke-amber-500',
-  [AlertLevel.Urgent]: 'stroke-red-500',
-}
-
-const BG_COLORS = {
-  [AlertLevel.None]: 'stroke-emerald-100',
-  [AlertLevel.Warning]: 'stroke-amber-100',
-  [AlertLevel.Urgent]: 'stroke-red-100',
-}
-
 export function RingProgress({ remaining, total, alertLevel }: RingProgressProps) {
-  const radius = 90
-  const strokeWidth = 12
+  const radius = 80
+  const strokeWidth = 8
+  const size = 200
+  const center = size / 2
   const circumference = 2 * Math.PI * radius
   const progress = total > 0 ? Math.max(0, remaining / total) : 0
   const offset = circumference * (1 - progress)
 
+  const colors = {
+    [AlertLevel.None]: { fg: '#000000', bg: 'rgba(0,0,0,0.06)' },
+    [AlertLevel.Warning]: { fg: '#FF9500', bg: 'rgba(255,149,0,0.12)' },
+    [AlertLevel.Urgent]: { fg: '#FF3B30', bg: 'rgba(255,59,48,0.12)' },
+  }
+
+  const { fg, bg } = colors[alertLevel]
+
   return (
-    <svg width="220" height="220" viewBox="0 0 220 220" className="transform -rotate-90">
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="transform -rotate-90">
       <circle
-        cx="110" cy="110" r={radius}
+        cx={center} cy={center} r={radius}
         fill="none"
         strokeWidth={strokeWidth}
-        className={BG_COLORS[alertLevel]}
+        stroke={bg}
       />
       <circle
-        cx="110" cy="110" r={radius}
+        cx={center} cy={center} r={radius}
         fill="none"
         strokeWidth={strokeWidth}
         strokeDasharray={circumference}
         strokeDashoffset={offset}
         strokeLinecap="round"
-        className={`${COLORS[alertLevel]} transition-all duration-500`}
+        stroke={fg}
+        style={{ transition: 'stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1), stroke 0.3s ease' }}
       />
     </svg>
   )

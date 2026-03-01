@@ -26,71 +26,71 @@ export function ActionButtons({
 
   return (
     <>
-      <div className="flex flex-col gap-3 w-full">
+      <div className="flex flex-col gap-2 w-full">
         <button
           onClick={() => { setTotalInput('60'); setDailyInput(String(currentDailyDoses || 3)); setModal('new') }}
-          className="w-full py-3 rounded-xl bg-emerald-600 text-white font-semibold hover:bg-emerald-700 transition"
+          className="w-full h-[50px] rounded-[14px] bg-black text-white text-[17px] font-medium tracking-[-0.4px] active:scale-[0.97] transition-transform"
         >
           开新药
         </button>
 
         {hasCartridge && (
-          <>
+          <div className="flex gap-2">
             <button
               onClick={() => { setRemainingInput(''); setModal('adjust') }}
-              className="w-full py-3 rounded-xl bg-slate-200 text-slate-700 font-medium hover:bg-slate-300 transition"
+              className="flex-1 h-[50px] rounded-[14px] bg-[#f6f6f6] text-black text-[15px] font-medium tracking-[-0.4px] active:scale-[0.97] active:bg-[#ebebeb] transition-all"
             >
-              修正剩余次数
+              修正次数
             </button>
             <button
               onClick={() => { setNewDailyInput(String(currentDailyDoses)); setModal('daily') }}
-              className="w-full py-3 rounded-xl bg-slate-200 text-slate-700 font-medium hover:bg-slate-300 transition"
+              className="flex-1 h-[50px] rounded-[14px] bg-[#f6f6f6] text-black text-[15px] font-medium tracking-[-0.4px] active:scale-[0.97] active:bg-[#ebebeb] transition-all"
             >
-              调整每日次数
+              调整每日
             </button>
-          </>
+          </div>
         )}
       </div>
 
       <Modal open={modal === 'new'} onClose={close} title="开新药">
-        <div className="flex flex-col gap-3">
-          <label className="text-sm text-slate-600">
-            总次数
+        <div className="flex flex-col gap-4">
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[13px] text-[rgba(60,60,67,0.6)] tracking-[-0.1px]">总次数</span>
             <input type="number" value={totalInput} onChange={e => setTotalInput(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-lg" />
+              className="w-full h-11 rounded-xl border border-[#e5e5ea] px-4 text-[17px] tracking-[-0.4px] outline-none focus:border-black transition-colors" />
           </label>
-          <label className="text-sm text-slate-600">
-            每日次数
+          <label className="flex flex-col gap-1.5">
+            <span className="text-[13px] text-[rgba(60,60,67,0.6)] tracking-[-0.1px]">每日次数</span>
             <input type="number" value={dailyInput} onChange={e => setDailyInput(e.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-lg" />
+              className="w-full h-11 rounded-xl border border-[#e5e5ea] px-4 text-[17px] tracking-[-0.4px] outline-none focus:border-black transition-colors" />
           </label>
           <button onClick={() => { onNewCartridge(Number(totalInput), Number(dailyInput)); close() }}
-            className="w-full py-2 rounded-xl bg-emerald-600 text-white font-semibold">
+            className="w-full h-[50px] rounded-[14px] bg-black text-white text-[17px] font-medium tracking-[-0.4px] active:scale-[0.97] transition-transform">
             确认
           </button>
         </div>
       </Modal>
 
       <Modal open={modal === 'adjust'} onClose={close} title="修正剩余次数">
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-4">
           <input type="number" placeholder="输入当前剩余次数" value={remainingInput}
             onChange={e => setRemainingInput(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-lg" />
+            className="w-full h-11 rounded-xl border border-[#e5e5ea] px-4 text-[17px] tracking-[-0.4px] outline-none focus:border-black transition-colors placeholder:text-[rgba(60,60,67,0.3)]" />
           <button onClick={() => { onAdjustRemaining(Number(remainingInput)); close() }}
-            className="w-full py-2 rounded-xl bg-emerald-600 text-white font-semibold">
+            className="w-full h-[50px] rounded-[14px] bg-black text-white text-[17px] font-medium tracking-[-0.4px] active:scale-[0.97] transition-transform">
             确认
           </button>
         </div>
       </Modal>
 
       <Modal open={modal === 'daily'} onClose={close} title="调整每日次数">
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-slate-500">从今天起生效</p>
+        <div className="flex flex-col gap-4">
+          <p className="text-[13px] text-[rgba(60,60,67,0.6)] tracking-[-0.1px]">从今天起生效</p>
           <input type="number" value={newDailyInput}
             onChange={e => setNewDailyInput(e.target.value)}
-            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-lg" />
+            className="w-full h-11 rounded-xl border border-[#e5e5ea] px-4 text-[17px] tracking-[-0.4px] outline-none focus:border-black transition-colors" />
           <button onClick={() => { onChangeDailyDoses(Number(newDailyInput)); close() }}
-            className="w-full py-2 rounded-xl bg-emerald-600 text-white font-semibold">
+            className="w-full h-[50px] rounded-[14px] bg-black text-white text-[17px] font-medium tracking-[-0.4px] active:scale-[0.97] transition-transform">
             确认
           </button>
         </div>
