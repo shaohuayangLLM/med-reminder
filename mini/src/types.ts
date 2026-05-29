@@ -17,11 +17,18 @@ export interface Cartridge {
   manualAdjustments: ManualAdjustment[]
 }
 
+export interface OperationLog {
+  timestamp: string   // ISO datetime e.g. "2026-03-28T14:30:00"
+  action: string      // e.g. "开新药", "修正次数", "调整每日"
+  detail: string      // e.g. "总60次 每日3次", "3→2次 今天生效"
+}
+
 export interface AppState {
   version: number
   currentCartridge: Cartridge | null
   history: Cartridge[]
   notificationEnabled: boolean
+  operationLogs: OperationLog[]
 }
 
-export const CURRENT_SCHEMA_VERSION = 2
+export const CURRENT_SCHEMA_VERSION = 3

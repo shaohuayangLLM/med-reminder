@@ -7,8 +7,7 @@ import { calculateDoseStatus } from '../../lib/dose-calculator'
 import { getAlertLevel, AlertLevel } from '../../lib/alert-level'
 import { StatusDisplay } from '../../components/StatusDisplay'
 import { ActionButtons } from '../../components/ActionButtons'
-import { History } from '../../components/History'
-import { DataManager } from '../../components/DataManager'
+import { RecordTabs } from '../../components/RecordTabs'
 import './index.scss'
 
 export default function Index() {
@@ -45,6 +44,19 @@ export default function Index() {
       })
     }
   })
+
+  const handleChangeDailyDoses = useCallback((dailyDoses: number, effectiveDate?: string) => {
+    const before = status
+    changeDailyDoses(dailyDoses, effectiveDate)
+    if (before) {
+      const newDays = Math.floor(before.remainingDoses / dailyDoses)
+      Taro.showToast({
+        title: `每日 ${before.currentDailyDoses}→${dailyDoses} 次 · 可用 ${before.remainingDays}→${newDays} 天`,
+        icon: 'none',
+        duration: 3000,
+      })
+    }
+  }, [changeDailyDoses, status])
 
   return (
     <View className='index'>
@@ -102,10 +114,13 @@ export default function Index() {
           currentDailyDoses={status?.currentDailyDoses ?? 3}
           onNewCartridge={startNewCartridge}
           onAdjustRemaining={adjustRemainingDoses}
-          onChangeDailyDoses={changeDailyDoses}
+          onChangeDailyDoses={handleChangeDailyDoses}
         />
-        <History history={state.history} onDelete={deleteHistory} />
-        <DataManager onImport={importData} />
+        <RecordTabs
+          logs={state.operationLogs ?? []}
+          history={state.history}
+          onDeleteHistory={deleteHistory}
+        />
       </View>
     </View>
   )

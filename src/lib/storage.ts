@@ -8,6 +8,7 @@ const DEFAULT_STATE: AppState = {
   currentCartridge: null,
   history: [],
   notificationEnabled: false,
+  operationLogs: [],
 }
 
 function migrate(raw: Record<string, unknown>): AppState {
@@ -18,8 +19,11 @@ function migrate(raw: Record<string, unknown>): AppState {
     raw.version = 2
   }
 
-  // Future migrations go here:
-  // if (version < 3) { ... }
+  // v2 -> v3: add operationLogs
+  if (version < 3) {
+    raw.version = 3
+    if (!raw.operationLogs) raw.operationLogs = []
+  }
 
   return raw as unknown as AppState
 }

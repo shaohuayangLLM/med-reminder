@@ -1,9 +1,15 @@
 import { useState } from 'react'
-import { View, Text, Input, Picker } from '@tarojs/components'
+import { View, Text, Input } from '@tarojs/components'
 import { Modal } from './Modal'
 
 function todayStr(): string {
   return new Date().toISOString().split('T')[0]
+}
+
+function tomorrowStr(): string {
+  const d = new Date()
+  d.setDate(d.getDate() + 1)
+  return d.toISOString().split('T')[0]
 }
 
 interface ActionButtonsProps {
@@ -26,7 +32,7 @@ export function ActionButtons({
   const [dailyInput, setDailyInput] = useState('3')
   const [remainingInput, setRemainingInput] = useState('')
   const [newDailyInput, setNewDailyInput] = useState('')
-  const [effectiveDateInput, setEffectiveDateInput] = useState('')
+  const [effectiveWhen, setEffectiveWhen] = useState<'today' | 'tomorrow'>('today')
 
   const close = () => setModal(null)
 
@@ -92,7 +98,7 @@ export function ActionButtons({
             </View>
             <View
               style={secondaryButtonStyle}
-              onClick={() => { setNewDailyInput(String(currentDailyDoses)); setEffectiveDateInput(todayStr()); setModal('daily') }}
+              onClick={() => { setNewDailyInput(String(currentDailyDoses)); setEffectiveWhen('today'); setModal('daily') }}
             >
               <Text style={{ color: '#000', fontSize: '15px', fontWeight: '500' }}>调整每日</Text>
             </View>
@@ -162,25 +168,51 @@ export function ActionButtons({
             />
           </View>
           <View>
-            <Text style={labelStyle}>生效日期</Text>
-            <Picker
-              mode='date'
-              value={effectiveDateInput}
-              onChange={e => setEffectiveDateInput(e.detail.value)}
-            >
-              <View style={{
-                ...inputStyle,
-                display: 'flex',
-                alignItems: 'center',
-                color: effectiveDateInput ? '#000' : 'rgba(60,60,67,0.3)',
-              }}>
-                <Text>{effectiveDateInput || '选择日期'}</Text>
+            <Text style={labelStyle}>何时生效</Text>
+            <View style={{ display: 'flex', flexDirection: 'row', gap: '8px' }}>
+              <View
+                style={{
+                  flex: 1,
+                  height: '44px',
+                  borderRadius: '12px',
+                  border: effectiveWhen === 'today' ? '1px solid #000' : '1px solid #e5e5ea',
+                  backgroundColor: effectiveWhen === 'today' ? '#000' : '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onClick={() => setEffectiveWhen('today')}
+              >
+                <Text style={{
+                  color: effectiveWhen === 'today' ? '#fff' : '#000',
+                  fontSize: '15px',
+                  fontWeight: '500',
+                }}>今天生效</Text>
               </View>
-            </Picker>
+              <View
+                style={{
+                  flex: 1,
+                  height: '44px',
+                  borderRadius: '12px',
+                  border: effectiveWhen === 'tomorrow' ? '1px solid #000' : '1px solid #e5e5ea',
+                  backgroundColor: effectiveWhen === 'tomorrow' ? '#000' : '#fff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+                onClick={() => setEffectiveWhen('tomorrow')}
+              >
+                <Text style={{
+                  color: effectiveWhen === 'tomorrow' ? '#fff' : '#000',
+                  fontSize: '15px',
+                  fontWeight: '500',
+                }}>明天生效</Text>
+              </View>
+            </View>
           </View>
           <View
             style={buttonStyle}
-            onClick={() => { onChangeDailyDoses(Number(newDailyInput), effectiveDateInput); close() }}
+            onClick={() => { onChangeDailyDoses(Number(newDailyInput), effectiveWhen === 'today' ? todayStr() : tomorrowStr()); close() }}
           >
             <Text style={{ color: '#fff', fontSize: '17px', fontWeight: '500' }}>确认</Text>
           </View>

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import type { AppState, Cartridge } from '../types'
+import type { AppState, Cartridge, OperationLog } from '../types'
 import { loadState, saveState, importState } from '../lib/storage'
 
 function generateId(): string {
@@ -8,6 +8,19 @@ function generateId(): string {
 
 function todayStr(): string {
   return new Date().toISOString().split('T')[0]
+}
+
+function nowTimestamp(): string {
+  return new Date().toISOString().slice(0, 19)
+}
+
+function addLog(prev: AppState, action: string, detail: string): OperationLog[] {
+  const logs = [...(prev.operationLogs ?? []), { timestamp: nowTimestamp(), action, detail }]
+  // Only keep logs from the last 30 days
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - 30)
+  const cutoffStr = cutoff.toISOString().slice(0, 19)
+  return logs.filter(l => l.timestamp >= cutoffStr)
 }
 
 export function useAppState() {
@@ -30,6 +43,7 @@ export function useAppState() {
         history: prev.currentCartridge
           ? [...prev.history, { ...prev.currentCartridge, endDate: today }]
           : prev.history,
+        operationLogs: addLog(prev, '开新药', `总${totalDoses}次 每日${dailyDoses}次`),
       }
       saveState(next)
       return next
@@ -49,6 +63,7 @@ export function useAppState() {
             { date: today, remainingDoses },
           ],
         },
+        operationLogs: addLog(prev, '修正次数', `剩余修正为 ${remainingDoses}次`),
       }
       saveState(next)
       return next
@@ -59,6 +74,11 @@ export function useAppState() {
     setState(prev => {
       if (!prev.currentCartridge) return prev
       const date = effectiveDate || todayStr()
+      const currentDaily = prev.currentCartridge.dosageChanges
+        .filter(c => c.date <= date)
+        .sort((a, b) => a.date.localeCompare(b.date))
+        .pop()?.dailyDoses ?? 0
+      const when = date === todayStr() ? '今天生效' : `${date}生效`
       const next: AppState = {
         ...prev,
         currentCartridge: {
@@ -68,6 +88,7 @@ export function useAppState() {
             { date, dailyDoses },
           ],
         },
+        operationLogs: addLog(prev, '调整每日', `${currentDaily}→${dailyDoses}次 ${when}`),
       }
       saveState(next)
       return next

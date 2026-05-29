@@ -1,15 +1,14 @@
-import { useEffect } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useAppState } from './hooks/useAppState'
 import { calculateDoseStatus } from './lib/dose-calculator'
 import { getAlertLevel, AlertLevel } from './lib/alert-level'
 import { requestNotificationPermission, sendNotification } from './lib/notification'
 import { StatusDisplay } from './components/StatusDisplay'
 import { ActionButtons } from './components/ActionButtons'
-import { History } from './components/History'
-import { DataManager } from './components/DataManager'
+import { RecordTabs } from './components/RecordTabs'
 
 function App() {
-  const { state, startNewCartridge, adjustRemainingDoses, changeDailyDoses, deleteHistory, importData } = useAppState()
+  const { state, startNewCartridge, adjustRemainingDoses, changeDailyDoses, deleteHistory } = useAppState()
   const today = new Date().toISOString().split('T')[0]
 
   const status = state.currentCartridge
@@ -19,6 +18,23 @@ function App() {
   const alertLevel = status
     ? getAlertLevel(status.remainingDoses, status.currentDailyDoses)
     : null
+
+  const [toast, setToast] = useState<string | null>(null)
+
+  const handleChangeDailyDoses = useCallback((dailyDoses: number, effectiveDate?: string) => {
+    const before = status
+    changeDailyDoses(dailyDoses, effectiveDate)
+    if (before) {
+      const msg = `每日 ${before.currentDailyDoses}→${dailyDoses} 次 · 可用 ${before.remainingDays}→${Math.floor(before.remainingDoses / dailyDoses)} 天`
+      setToast(msg)
+    }
+  }, [changeDailyDoses, status])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(null), 3000)
+    return () => clearTimeout(timer)
+  }, [toast])
 
   useEffect(() => {
     if (alertLevel && alertLevel !== AlertLevel.None) {
@@ -30,6 +46,12 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white flex justify-center safe-area-top safe-area-bottom">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-12 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-black/90 text-white text-[14px] font-medium tracking-[-0.2px] shadow-lg animate-[fadeInUp_0.25s_ease-out]">
+          {toast}
+        </div>
+      )}
       <div className="w-full max-w-[393px] flex flex-col min-h-screen">
         {/* Header */}
         <div className="flex items-center justify-center h-11 shrink-0">
@@ -67,10 +89,13 @@ function App() {
             currentDailyDoses={status?.currentDailyDoses ?? 3}
             onNewCartridge={startNewCartridge}
             onAdjustRemaining={adjustRemainingDoses}
-            onChangeDailyDoses={changeDailyDoses}
+            onChangeDailyDoses={handleChangeDailyDoses}
           />
-          <History history={state.history} onDelete={deleteHistory} />
-          <DataManager onImport={importData} />
+          <RecordTabs
+            logs={state.operationLogs ?? []}
+            history={state.history}
+            onDeleteHistory={deleteHistory}
+          />
         </div>
       </div>
     </div>

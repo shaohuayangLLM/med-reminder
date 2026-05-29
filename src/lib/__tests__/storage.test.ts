@@ -26,6 +26,7 @@ describe('storage', () => {
       },
       history: [],
       notificationEnabled: true,
+      operationLogs: [],
     }
     saveState(state)
     expect(loadState()).toEqual(state)
@@ -61,6 +62,7 @@ describe('storage', () => {
       },
       history: [],
       notificationEnabled: true,
+      operationLogs: [],
     }
     saveState(state)
     const json = exportState()
